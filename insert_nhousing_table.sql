@@ -1,6 +1,5 @@
-
+--Create MySQL table to prepare for CSV loading
 use nashville_housing
-
 CREATE TABLE nashville_housing
 (unique_id INT,
 parcel_id VARCHAR(255),
@@ -22,6 +21,7 @@ bedrooms INT,
 full_bath INT,
 half_bath INT);
 
+--load csv file into MySQL. If cell is empty, input null
 LOAD DATA lOCAL INFILE '/Users/austinshirk/Documents/cs/Projects/Nashville_Housing/Nashville Housing Data.csv'
 INTO TABLE nashville_housing
 FIELDS TERMINATED BY ","
@@ -52,13 +52,16 @@ SET
     full_bath = IF(@col18 = '', NULL, @col18),
     half_bath = IF(@col19 = '', NULL, @col19);
 	
-
+--Change 'sale_date' column datatype from string to date datatype
+-- Rename the original 'sale_date' column to 'old_sale_date'
 ALTER TABLE nashville_housing
 RENAME COLUMN sale_date TO old_sale_date;
 
+--Add a 'sale_date' column with date datatype
 ALTER TABLE nashville_housing
 ADD COLUMN sale_date date;
 
+-- Update the 'sale_date' column by converting 'old_sale_date' string values to date datatype.
 UPDATE nashville_housing
 SET sale_date = STR_TO_DATE(old_sale_date, '%d-%b-%y');
 
